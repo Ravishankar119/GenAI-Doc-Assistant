@@ -7,4 +7,6 @@ transformers
 torch
 pymupdf
 langchain-community
+sentence-transformers
+
 
