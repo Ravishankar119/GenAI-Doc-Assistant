@@ -6,3 +6,5 @@ faiss-cpu
 transformers
 torch
 pymupdf
+langchain-community
+
