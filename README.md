@@ -3,6 +3,10 @@
 
 A powerful Streamlit-based GenAI application that lets you **upload PDF or TXT documents** and interact with them using artificial intelligence. Get instant summaries, ask questions, generate logic-based questions, and even evaluate your own answers — all powered by OpenAI and LangChain.
 
+## 🌐 Live Demo
+
+👉 Click here to open the app - https://ravishankar-genai-doc-assistant.streamlit.app/
+
 ## Features
 
 -  **Document Summarization**
