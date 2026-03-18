@@ -5,8 +5,3 @@ PyPDF2
 faiss-cpu
 transformers
 torch
-pymupdf
-langchain-community
-sentence-transformers
-
-
