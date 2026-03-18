@@ -2,11 +2,9 @@ streamlit
 langchain
 langchain-community
 langchain-text-splitters
-transformers==4.37.2
-torch==2.1.2
+transformers
+torch
 sentence-transformers
 faiss-cpu
 pymupdf
 python-dotenv
-openai
-tiktoken
