@@ -1,7 +1,7 @@
 
 from transformers import pipeline
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
 
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
