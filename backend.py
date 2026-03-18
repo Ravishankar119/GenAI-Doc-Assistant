@@ -13,19 +13,16 @@ embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 # ✅ STRONG CLEANING FUNCTION
 def clean_text(text):
-    # remove repeated words (stairs stairs → stairs)
+    # remove repeated words
     text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
 
-    # remove repeated sequences
-    text = re.sub(r'(\b\w+\b(?:\s+\b\w+\b){0,5})\s+\1+', r'\1', text)
+    # remove repeating sequences
+    text = re.sub(r'(\b\w+\b(?:\s+\b\w+\b){0,10})\s+\1+', r'\1', text)
 
     # remove garbage words
     text = re.sub(r'(stairs\s*)+', '', text, flags=re.IGNORECASE)
 
-    # remove long repeated characters
-    text = re.sub(r'(.)\1{5,}', '', text)
-
-    # remove special symbols
+    # remove special characters
     text = re.sub(r'[^a-zA-Z0-9.,!?%()\-\s]', ' ', text)
 
     # normalize spaces
@@ -40,12 +37,11 @@ def summarize_doc(text):
 
     words = text.split()
     if len(words) < 30:
-        return "⚠️ PDF content too short or unreadable."
+        return "⚠️ PDF not readable"
 
-    # detect garbage text
-    unique_ratio = len(set(words)) / (len(words) + 1)
-    if unique_ratio < 0.3:
-        return "⚠️ PDF text seems corrupted."
+    unique_ratio = len(set(words)) / len(words)
+    if unique_ratio < 0.4:
+        return "⚠️ Text is noisy, try another PDF"
 
     text = text[:2000]
 
