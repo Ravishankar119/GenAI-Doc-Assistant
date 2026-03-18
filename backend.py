@@ -4,50 +4,52 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import re
 
-# ✅ load models once (fast + stable)
+# ✅ Load models
 qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad")
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-6-6")
 
 embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 
-# ✅ IMPROVED CLEAN TEXT FUNCTION (MAIN FIX 🔥)
+# ✅ STRONG CLEANING FUNCTION
 def clean_text(text):
-    # remove repeated words like stairs stairs stairs
+    # remove repeated words (stairs stairs → stairs)
     text = re.sub(r'\b(\w+)( \1\b)+', r'\1', text)
 
-    # remove specific garbage words
+    # remove repeated sequences
+    text = re.sub(r'(\b\w+\b(?:\s+\b\w+\b){0,5})\s+\1+', r'\1', text)
+
+    # remove garbage words
     text = re.sub(r'(stairs\s*)+', '', text, flags=re.IGNORECASE)
 
-    # remove very long repeated characters
-    text = re.sub(r'(.)\1{10,}', '', text)
+    # remove long repeated characters
+    text = re.sub(r'(.)\1{5,}', '', text)
 
-    # remove "Comments" section if exists
-    if "Comments" in text:
-        text = text.split("Comments")[0]
+    # remove special symbols
+    text = re.sub(r'[^a-zA-Z0-9.,!?%()\-\s]', ' ', text)
 
-    # remove extra spaces
+    # normalize spaces
     text = re.sub(r'\s+', ' ', text)
 
     return text.strip()
 
 
-# ✅ SUMMARY (MORE SAFE)
+# ✅ SUMMARY
 def summarize_doc(text):
     text = clean_text(text)
+
+    words = text.split()
+    if len(words) < 30:
+        return "⚠️ PDF content too short or unreadable."
+
+    # detect garbage text
+    unique_ratio = len(set(words)) / (len(words) + 1)
+    if unique_ratio < 0.3:
+        return "⚠️ PDF text seems corrupted."
+
     text = text[:2000]
 
-    # safety check
-    if len(text.split()) < 30:
-        return "⚠️ PDF content not readable or too short."
-
-    summary = summarizer(
-        text,
-        max_length=120,
-        min_length=40,
-        do_sample=False
-    )
-
+    summary = summarizer(text, max_length=120, min_length=40, do_sample=False)
     return summary[0]['summary_text']
 
 
@@ -55,17 +57,13 @@ def summarize_doc(text):
 def prepare_vector_db(text):
     text = clean_text(text)
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=300,
-        chunk_overlap=50
-    )
-
+    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=50)
     docs = splitter.create_documents([text])
 
     return FAISS.from_documents(docs, embedding)
 
 
-# ✅ CHATBOT Q&A (MORE ROBUST)
+# ✅ Q&A
 def ask_question(retriever, query):
     docs = retriever.get_relevant_documents(query)
 
@@ -83,7 +81,7 @@ def ask_question(retriever, query):
     return f"💡 {answer}"
 
 
-# ✅ LOGIC QUESTIONS (SAME)
+# ✅ LOGIC QUESTIONS
 def generate_logic_questions(text):
     return (
         "1. What is the main idea of the document?\n"
@@ -92,7 +90,7 @@ def generate_logic_questions(text):
     )
 
 
-# ✅ EVALUATION (BETTER MATCHING)
+# ✅ EVALUATION
 def evaluate_user_answer(question, user_answer, context):
     context = clean_text(context)
 
