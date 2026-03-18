@@ -3,14 +3,14 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-# ✅ lightweight models
+# lightweight models (important)
 def get_summarizer():
     return pipeline("text-generation", model="sshleifer/tiny-gpt2")
 
 def get_qa_pipeline():
     return pipeline("question-answering", model="distilbert-base-uncased-distilled-squad")
 
-# embeddings (light)
+# embeddings
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 
