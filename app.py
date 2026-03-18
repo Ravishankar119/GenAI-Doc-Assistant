@@ -2,12 +2,16 @@ import streamlit as st
 import fitz  
 from backend import summarize_doc, prepare_vector_db, ask_question, generate_logic_questions, evaluate_user_answer
 
+# ✅ FIXED PDF EXTRACTION (ONLY CHANGE)
 def extract_text_from_pdf(file):
     doc = fitz.open(stream=file.read(), filetype="pdf")
     text = ""
     for page in doc:
-        text += page.get_text()
+        t = page.get_text("text")  # 🔥 important fix
+        if t:
+            text += t + "\n"
     return text
+
 
 st.set_page_config(page_title="📄 GenAI Doc Assistant", layout="wide")
 
