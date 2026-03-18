@@ -2,15 +2,20 @@ import streamlit as st
 import fitz  
 from backend import summarize_doc, prepare_vector_db, ask_question, generate_logic_questions, evaluate_user_answer
 
-# ✅ IMPROVED PDF EXTRACTION
+# ✅ FINAL ROBUST PDF EXTRACTION
 def extract_text_from_pdf(file):
     doc = fitz.open(stream=file.read(), filetype="pdf")
     text = ""
 
     for page in doc:
-        blocks = page.get_text("blocks")
-        for b in blocks:
-            text += b[4] + "\n"
+        t = page.get_text("text")
+
+        # fallback if poor extraction
+        if len(t.split()) < 20:
+            blocks = page.get_text("blocks")
+            t = " ".join([b[4] for b in blocks])
+
+        text += t + "\n"
 
     return text
 
