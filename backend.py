@@ -2,7 +2,7 @@
 from transformers import pipeline
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
 qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad")
