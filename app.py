@@ -2,14 +2,16 @@ import streamlit as st
 import fitz  
 from backend import summarize_doc, prepare_vector_db, ask_question, generate_logic_questions, evaluate_user_answer
 
-# ✅ FIXED PDF EXTRACTION (ONLY CHANGE)
+# ✅ IMPROVED PDF EXTRACTION
 def extract_text_from_pdf(file):
     doc = fitz.open(stream=file.read(), filetype="pdf")
     text = ""
+
     for page in doc:
-        t = page.get_text("text")  # 🔥 important fix
-        if t:
-            text += t + "\n"
+        blocks = page.get_text("blocks")
+        for b in blocks:
+            text += b[4] + "\n"
+
     return text
 
 
